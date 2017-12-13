@@ -1,1 +1,7 @@
-{"name": "Show Workspaces", "description": "Expand the workspace switcher when more than one workspace is in use", "uuid": "gse-show-workspaces@ns.petersimonyi.ca", "shell-version": ["3.26.2"]}
+{
+    "name": "Show Workspaces",
+    "description": "Expand the workspace switcher when more than one workspace is in use",
+    "url": "https://github.com/psimonyi/gse-show-workspaces",
+    "uuid": "gse-show-workspaces@ns.petersimonyi.ca",
+    "shell-version": ["3.26.2"]
+}
