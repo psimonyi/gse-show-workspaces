@@ -1,6 +1,7 @@
 // Basically revert this commit:
 // https://git.gnome.org/browse/gnome-shell/commit/js/ui/overviewControls.js?id=2d849759c837ebc60f41022ce9ae83616ba0274e
 
+const Lang = imports.lang;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const ThumbnailsSlider = imports.ui.overviewControls.ThumbnailsSlider;
