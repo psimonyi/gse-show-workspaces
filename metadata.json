@@ -1,5 +1,5 @@
 {
-    "name": "Show Workspaces",
+    "name": "Expand Workspaces Switcher",
     "description": "Expand the workspace switcher when more than one workspace is in use",
     "url": "https://github.com/psimonyi/gse-show-workspaces",
     "uuid": "gse-show-workspaces@ns.petersimonyi.ca",
