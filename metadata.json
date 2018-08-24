@@ -3,5 +3,5 @@
     "description": "Expand the workspace switcher when more than one workspace is in use",
     "url": "https://github.com/psimonyi/gse-show-workspaces",
     "uuid": "gse-show-workspaces@ns.petersimonyi.ca",
-    "shell-version": ["3.26.2"]
+    "shell-version": ["3.26.2", "3.28.3"]
 }
