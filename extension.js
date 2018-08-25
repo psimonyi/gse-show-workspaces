@@ -5,50 +5,28 @@ const ThumbnailsSlider = imports.ui.overviewControls.ThumbnailsSlider;
 
 const Meta = imports.gi.Meta;
 
-const Config = imports.misc.config;
-
 class ShowWorkSpaces {
-    constructor({uuid="show-workspaces@uuid.com", name="Show Workspaces"} = {}) {
-        this.sliders = [];
+    constructor({uuid = "show-workspaces@uuid.com", 
+                metadata: {name="Show Workspaces"}} = {}) {
+        this.modifiedSliders = [];
         this.uuid = uuid;
-
-        // this.log(`Enabled extensions: ${[...new Set(ExtensionSystem.getEnabledExtensions())]}`);
+        
+        this.discoveredSliders = ShowWorkSpaces.discoverSliders(uuid);
+        this.log('===========================================================');
         this.log(`Created "${name}"`);
-        this.log(`${JSON.stringify(Config.PACKAGE_NAME)}`);
+        this.log('===========================================================');
     }
 
-    start() {
-        this.log("Starting plugin...");
-        this.startForSlider(ThumbnailsSlider);
-
-        Main.overview.connect('showing', () => {
-            
-            // let workSpaceViews = Main.overview.viewSelector._workspacesDisplay._workspacesViews;
-            // this.log(`Number of views: ${workSpaceViews.length}`);
-            // let shown = false;
-            // for (const view of workSpaceViews) {
-            //     this.log(`WorkspaceView on monitor: ${view._monitorIndex}`,
-            //         `has ${view._workspaces.length} workspaces`);
-            //     // if (!shown) {
-            //     //     for (const workspace of view._workspaces) {
-            //     //         this.log(Object.getOwnPropertyNames(workspace.metaWorkspace));
-            //     //         break;
-            //     //     }
-            //     //     shown = true;
-            //     // }
-            // }
-
-            // this.log(`Controls: ${Object.getOwnPropertyNames(Main.overview._controls)}`)
-
-            // Main.overview._controls._thumbnailsSlider.slideIn();
-        });
-    }
-
-    stop() {
-        this.log("Stopping plugin...");
-        for (const {source, initialSlide} of this.sliders) {
-            this.undoAlwaysShowSlider(source, initialSlide);
+    static discoverSliders(uuid) {
+        const discovered = [ThumbnailsSlider];
+        for (const ext of new Set(ExtensionSystem.getEnabledExtensions())) {
+            if (ext === 'multi-monitors-add-on@spin83') {
+                if (Array.isArray(Main.mmOverview) && Main.mmOverview.length > 0) {
+                    discovered.push(Main.mmOverview[0]._controls._thumbnailsSlider.constructor);
+                }
+            }
         }
+        return discovered;
     }
 
     startForSlider(slidingControlType) {
@@ -58,23 +36,23 @@ class ShowWorkSpaces {
             this.makeAlwaysShowSlider(slidingControlType, () => {
                 const screen = global.screen;
                 if (!Meta.prefs_get_dynamic_workspaces() ||
-                    screen.n_workspaces > 1 ||
+                    screen.n_workspaces > 2 ||
                     screen.get_active_workspace_index !== 0) {
                     return 1;
                 }
                 return 0;
             }, _getSlide);
 
-            this.sliders.push({
+            this.modifiedSliders.push({
                 source: slidingControlType,
                 initialSlide: _getSlide
             });
         }
     }
 
-    makeAlwaysShowSlider(slidingControlType, replaceGetSlide, fallback) {
+    makeAlwaysShowSlider(slidingControlType, hookGetSlide, fallback) {
         slidingControlType.prototype._getSlide = function () {
-            let value = replaceGetSlide();
+            let value = hookGetSlide();
             if (value !== 0) {
                 return value;
             }
@@ -86,8 +64,20 @@ class ShowWorkSpaces {
         slidingControlType.prototype._getSlide = initialFunc;
     }
 
+    start() {
+        this.log("Starting plugin...");
+        this.discoveredSliders.forEach(slider => this.startForSlider(slider));
+    }
+
+    stop() {
+        this.log("Stopping plugin...");
+        for (const { source, initialSlide } of this.modifiedSliders) {
+            this.undoAlwaysShowSlider(source, initialSlide);
+        }
+    }
+
     log(...message) {
-        global.log(`[${this.uuid}]: ${message.join(" ")}`);
+        global.log(`<${this.uuid}> ${message.join(" ")}`);
     }
 }
 
