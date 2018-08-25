@@ -21,8 +21,12 @@ class ShowWorkSpaces {
         const discovered = [ThumbnailsSlider];
         for (const ext of new Set(ExtensionSystem.getEnabledExtensions())) {
             if (ext === 'multi-monitors-add-on@spin83') {
-                if (Array.isArray(Main.mmOverview) && Main.mmOverview.length > 0) {
-                    discovered.push(Main.mmOverview[0]._controls._thumbnailsSlider.constructor);
+                try {
+                    if (Array.isArray(Main.mmOverview) && Main.mmOverview.length > 0) {
+                        discovered.push(Main.mmOverview[0]._controls._thumbnailsSlider.constructor);
+                    }
+                } catch (e) {
+                    global.logError(e, `<${uuid}> Error attempting to add multimonitor sliders`);
                 }
             }
         }
